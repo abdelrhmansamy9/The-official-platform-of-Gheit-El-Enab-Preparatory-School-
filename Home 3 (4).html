@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منصة معهد غيط العنب الإعدادي</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      text-align: center;
+      background: linear-gradient(to right, #004080, #0073e6);
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+    .hidden { display: none; }
+    .container, .post-container, .login-box, .comment-container {
+      background-color: rgba(255,255,255,0.2);
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 1000px;
+      margin: auto;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    input, textarea {
+      width: 90%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+    button {
+      background-color: #ffdd57;
+      color: #004080;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover { background-color: #f4c400; }
+    .post-list {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .post-item {
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      text-align: left;
+      position: relative;
+    }
+    .post-title {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .post-content {
+      font-size: 18px;
+      color: #f0f0f0;
+    }
+    .post-media {
+      margin-top: 10px;
+      text-align: center;
+    }
+    .post-media img, .post-media video {
+      max-width: 100%;
+      border-radius: 10px;
+    }
+    .post-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    .like-btn, .delete-btn, .comment-btn {
+      background-color: transparent;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div id="loginPage">
+    <h1>👋 مرحبًا بك في منصة معهد غيط العنب الإعدادي الرسمية</h1>
+    <p>《 تأسيس / عبدالرحمن سامي سليمة 》</p>
+    <p>يرجى إدخال اسمك الرباعي وكلمة التأكيد الصحيحة</p>
+    <div class="login-box">
+      <input type="text" id="fullName" placeholder="✏️ أدخل اسمك الرباعي" required>
+      <input type="password" id="confirmationCode" placeholder="🔑 أدخل كلمة التأكيد" required>
+      <button onclick="validateLogin()">🔐 تسجيل الدخول</button>
+    </div>
+    <p>⚠️ هذه المنصة خاصة بطلاب معهد غيط العنب الإعدادي بنين فقط وممنوع نهائي دخول أي أحد خارج المعهد ⚠️</p>
+  </div>
+
+  <div class="container hidden" id="mainPage">
+    <h1>🎉 مرحبًا بك في المنصة الرسمية لطلاب معهد غيط العنب الإعدادي!</h1>
+    <h2 id="welcomeMessage"></h2>
+    <p>يمكنك الآن تصفح الأخبار المدرسية، الفعاليات، والمحتوى التعليمي.</p>
+    <div class="button-container">
+      <button onclick="showAddPost()">📝 إضافة منشور جديد</button>
+      <button onclick="sendQuestion()">❓ إرسال سؤال للمعلمين</button>
+      <button onclick="openChat()">💬 المحادثات الخاصة</button>
+      <button onclick="logout()">🔐 تسجيل الخروج</button>
+    </div>
+    <div class="post-list" id="postList"></div>
+  </div>
+
+  <div class="post-container hidden" id="addPostPage">
+    <h1>✍️ إضافة منشور جديد</h1>
+    <input type="text" id="postTitleInput" placeholder="📝 عنوان المنشور" required>
+    <textarea id="postContent" placeholder="✏️ اكتب محتوى المنشور هنا" rows="5" required></textarea>
+    <h3>📂 قم برفع الملفات:</h3>
+    <input type="file" id="fileUpload" accept="image/*,video/*,.pdf,.doc,.docx">
+    <div class="button-container">
+      <button onclick="submitPost()">✅ نشر المنشور</button>
+      <button onclick="cancelPost()">❌ إلغاء</button>
+    </div>
+  </div>
+
+  <div class="comment-container hidden" id="commentSection">
+    <h2 id="commentPostTitle"></h2>
+    <div id="commentsList"></div>
+    <textarea id="newComment" placeholder="✏️ أضف تعليقًا" rows="3"></textarea>
+    <div class="button-container">
+      <button onclick="addComment()">✅ نشر التعليق</button>
+      <button onclick="backToMain()">🔙 رجوع</button>
+    </div>
+  </div>
+
+  <script>
+    let posts = JSON.parse(localStorage.getItem("posts")) || [];
+    let currentPostId = null;
+    let userName = "";
+
+    function validateLogin() {
+      const nameInput = document.getElementById("fullName").value.trim();
+      if (!nameInput) {
+        alert("يرجى إدخال الاسم أولاً.");
+        return;
+      }
+      userName = nameInput;
+      document.getElementById("welcomeMessage").innerText = `مرحبًا، ${userName}`;
+      document.getElementById("loginPage").classList.add("hidden");
+      document.getElementById("mainPage").classList.remove("hidden");
+      loadPosts();
+    }
+
+    function logout() {
+      document.getElementById("loginPage").classList.remove("hidden");
+      document.getElementById("mainPage").classList.add("hidden");
+    }
+
+    function showAddPost() {
+      document.getElementById("mainPage").classList.add("hidden");
+      document.getElementById("addPostPage").classList.remove("hidden");
+    }
+
+    function cancelPost() {
+      document.getElementById("addPostPage").classList.add("hidden");
+      document.getElementById("mainPage").classList.remove("hidden");
+    }
+
+    function submitPost() {
+      let title = document.getElementById("postTitleInput").value;
+      let content = document.getElementById("postContent").value;
+      let file = document.getElementById("fileUpload").files[0];
+
+      if (!title.trim() || !content.trim()) {
+        alert("⚠️ الرجاء إدخال عنوان المنشور والمحتوى!");
+        return;
+      }
+
+      let post = { title, content, id: Date.now(), likes: 0, comments: [] };
+
+      if (file) {
+        post.fileURL = URL.createObjectURL(file);
+        post.fileType = file.type.startsWith("image") ? "img" : file.type.startsWith("video") ? "video" : null;
+      }
+
+      posts.push(post);
+      localStorage.setItem("posts", JSON.stringify(posts));
+      loadPosts();
+
+      document.getElementById("addPostPage").classList.add("hidden");
+      document.getElementById("mainPage").classList.remove("hidden");
+    }
+
+    function loadPosts() {
+      let postList = document.getElementById("postList");
+      postList.innerHTML = "";
+
+      posts.forEach(post => {
+        let mediaHTML = "";
+        if (post.fileURL) {
+          if (post.fileType === "img") {
+            mediaHTML = `<div class="post-media"><img src="${post.fileURL}" alt="صورة"></div>`;
+          } else if (post.fileType === "video") {
+            mediaHTML = `<div class="post-media"><video controls src="${post.fileURL}"></video></div>`;
+          }
+        }
+
+        let postItem = document.createElement("div");
+        postItem.className = "post-item";
+        postItem.innerHTML = `
+          <div class='post-title'>${post.title}</div>
+          <div class='post-content'>${post.content}</div>
+          ${mediaHTML}
+          <div class='post-actions'>
+            <button class="like-btn" onclick="likePost(${post.id})">❤️ ${post.likes}</button>
+            <button class="comment-btn" onclick="commentPost(${post.id})">💬 تعليق</button>
+            <button class="delete-btn" onclick="deletePost(${post.id})">🗑️ حذف</button>
+          </div>`;
+
+        postList.appendChild(postItem);
+      });
+    }
+
+    function likePost(postId) {
+      posts = posts.map(post => post.id === postId ? { ...post, likes: post.likes + 1 } : post);
+      localStorage.setItem("posts", JSON.stringify(posts));
+      loadPosts();
+    }
+
+    function commentPost(postId) {
+      currentPostId = postId;
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+
+      document.getElementById("mainPage").classList.add("hidden");
+      document.getElementById("commentSection").classList.remove("hidden");
+
+      document.getElementById("commentPostTitle").innerText = post.title;
+      renderComments(post.comments);
+    }
+
+    function renderComments(comments) {
+      const commentsList = document.getElementById("commentsList");
+      commentsList.innerHTML = comments.map(comment => `<p>${comment}</p>`).join("");
+    }
+
+    function addComment() {
+      const comment = document.getElementById("newComment").value.trim();
+      if (!comment) return;
+
+      const commentWithName = `${userName}: ${comment}`;
+
+      posts = posts.map(post =>
+        post.id === currentPostId
+          ? { ...post, comments: [...post.comments, commentWithName] }
+          : post
+      );
+
+      localStorage.setItem("posts", JSON.stringify(posts));
+      const updatedPost = posts.find(p => p.id === currentPostId);
+      renderComments(updatedPost.comments);
+      document.getElementById("newComment").value = "";
+    }
+
+    function backToMain() {
+      document.getElementById("commentSection").classList.add("hidden");
+      document.getElementById("mainPage").classList.remove("hidden");
+    }
+
+    function deletePost(postId) {
+      posts = posts.filter(post => post.id !== postId);
+      localStorage.setItem("posts", JSON.stringify(posts));
+      loadPosts();
+    }
+
+    function sendQuestion() {
+      alert("هذه الميزة قيد التطوير.");
+    }
+
+    function openChat() {
+      alert("المحادثات الخاصة غير متاحة حالياً.");
+    }
+
+    window.onload = loadPosts;
+ 
+window.onload = function() {
+    let savedUser = localStorage.getItem("userName");
+    if (savedUser) {
+        document.getElementById("welcomeMessage").innerText = `مرحبًا، ${savedUser}`;
+        document.getElementById("loginPage").classList.add("hidden");
+        document.getElementById("mainPage").classList.remove("hidden");
+}
+};</script></body></html>
